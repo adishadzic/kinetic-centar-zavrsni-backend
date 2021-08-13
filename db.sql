@@ -34,5 +34,7 @@ CREATE TABLE reservation(
     reservation_date DATE NOT NULL,
     reservation_name VARCHAR(30),
     service_id INT,
-    CONSTRAINT fk_service_id FOREIGN KEY(service_id) REFERENCES Service(service_id)
+    client_id,
+    CONSTRAINT fk_service_id FOREIGN KEY(service_id) REFERENCES service(service_id),
+    CONSTRAINT fk_client_id FOREIGN KEY(client_id) REFERENCES client(client_id)
 );

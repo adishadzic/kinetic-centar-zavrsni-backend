@@ -58,6 +58,20 @@ router.get('/clients/:id', async (req, res) => {
 });
 
 /* Update client's info */
+router.put('/clients/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { client_email } = req.body; // napraviti kondicionalno updateanje
+    const updateInfo = await pool.query('UPDATE client SET client_email = $1 WHERE todo_id = $2', [
+      client_email,
+      id,
+    ]);
+
+    res.json('Client`s email was updated!');
+  } catch (err) {
+    console.error(err.message);
+  }
+});
 
 /* Remove a client */
 router.delete('/clients/:id', async (req, res) => {

@@ -43,7 +43,7 @@ router.get('/services/:id', async (req, res) => {
 router.put('/services/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { service_description } = req.body;
+    const { service_description } = req.body; // napraviti kondicionalno updateanje
     const updateService = await pool.query(
       'UPDATE service SET service_description = $1 WHERE service_id = $2',
       [service_description, id]
