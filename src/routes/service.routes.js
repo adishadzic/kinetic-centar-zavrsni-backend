@@ -1,10 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../database_pool');
-const cors = require('cors');
+const pool = require('../config/databaseConfig');
 
-/* Add a new service */
-router.post('/services', async (req, res) => {
+const addNewService = async (req, res) => {
   try {
     const { service_id, service_name, service_description, service_duration, service_price } = req.body;
     const newService = await pool.query(
@@ -16,20 +14,18 @@ router.post('/services', async (req, res) => {
   } catch (err) {
     console.error(err.message);
   }
-});
+};
 
-/* Get all services*/
-router.get('/services', async (req, res) => {
+const getAllServices = async (req, res) => {
   try {
     const allServices = await pool.query('SELECT * FROM service');
     res.json(allServices.rows);
   } catch (err) {
     console.error(err.message);
   }
-});
+};
 
-/* Get one service */
-router.get('/services/:id', async (req, res) => {
+const getServiceById = async (req, res) => {
   try {
     const { id } = req.params;
     const service = await pool.query('SELECT * FROM service WHERE service_id=$1', [id]);
@@ -37,26 +33,45 @@ router.get('/services/:id', async (req, res) => {
   } catch (err) {
     console.error(err.message);
   }
-});
+};
 
-/* Update a service */
-router.put('/services/:id', async (req, res) => {
+const updateService = async (req, res) => {
   try {
     const { id } = req.params;
-    const { service_description } = req.body; // napraviti kondicionalno updateanje
-    const updateService = await pool.query(
-      'UPDATE service SET service_description = $1 WHERE service_id = $2',
-      [service_description, id]
-    );
+    if (req.body.service_description) {
+      await pool.query('UPDATE service SET service_description = $1 WHERE service_id = $2', [
+        req.body.service_description,
+        id,
+      ]);
+    }
+    if (req.body.service_name) {
+      await pool.query('UPDATE service SET service_name = $1 WHERE service_id = $2', [
+        req.body.service_name,
+        id,
+      ]);
+    }
+
+    if (req.body.service_duration) {
+      await pool.query('UPDATE service SET service_duration = $1 WHERE service_id = $2', [
+        req.body.service_duration,
+        id,
+      ]);
+    }
+
+    if (req.body.service_price) {
+      await pool.query('UPDATE service SET service_price = $1 WHERE service_id = $2', [
+        req.body.service_price,
+        id,
+      ]);
+    }
 
     res.json('Service was updated!');
   } catch (err) {
     console.error(err.message);
   }
-});
+};
 
-/* Delete a service */
-router.delete('/services/:id', async (req, res) => {
+const removeService = async (req, res) => {
   try {
     const { id } = req.params;
     const deleteService = await pool.query('DELETE FROM service WHERE service_id=$1', [id]);
@@ -65,6 +80,6 @@ router.delete('/services/:id', async (req, res) => {
   } catch (err) {
     console.error(err.message);
   }
-});
+};
 
-module.exports = router;
+module.exports = { addNewService, getAllServices, getServiceById, updateService, removeService };
