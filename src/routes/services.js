@@ -1,5 +1,3 @@
-const express = require('express');
-const router = express.Router();
 const pool = require('../config/databaseConfig');
 
 const addNewService = async (req, res) => {
@@ -74,7 +72,7 @@ const updateService = async (req, res) => {
 const removeService = async (req, res) => {
   try {
     const { id } = req.params;
-    const deleteService = await pool.query('DELETE FROM service WHERE service_id=$1', [id]);
+    await pool.query('DELETE FROM service WHERE service_id=$1', [id]);
 
     res.json('Service was removed from the database!');
   } catch (err) {

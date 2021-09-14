@@ -1,34 +1,30 @@
 const pool = require('../config/databaseConfig');
+const { clienEmailValidation } = require('../utils/validation');
 
 const addNewClient = async (req, res) => {
+  const { error } = clienEmailValidation(req.body);
+  if (error) {
+    return res.status(400).send(error.details[0].message);
+  }
+
   try {
     const {
       client_first_name,
       client_last_name,
       client_email,
-      client_age,
-      client_profile_picture,
       client_phone_number,
       client_birth_date,
       client_sex,
     } = req.body;
     const newClient = await pool.query(
-      'INSERT INTO client (client_first_name, client_last_name, client_email, client_age, client_profile_picture, client_phone_number, client_birth_date, client_sex) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-      [
-        client_first_name,
-        client_last_name,
-        client_email,
-        client_age,
-        client_profile_picture,
-        client_phone_number,
-        client_birth_date,
-        client_sex,
-      ]
+      'INSERT INTO client (client_first_name, client_last_name, client_email, client_phone_number, client_birth_date, client_sex) VALUES($1, $2, $3, $4, $5, $6) RETURNING *',
+      [client_first_name, client_last_name, client_email, client_phone_number, client_birth_date, client_sex]
     );
 
-    res.json(newClient.rows[0]);
+    res.json({ Success: newClient.rows[0] });
   } catch (err) {
     console.error(err.message);
+    res.json({ error: err.message });
   }
 };
 
@@ -51,7 +47,6 @@ const getClientById = async (req, res) => {
   }
 };
 
-/* Doraditi */
 const updateClientInfo = async (req, res) => {
   try {
     const { id } = req.params;
@@ -63,17 +58,6 @@ const updateClientInfo = async (req, res) => {
       ]);
     }
 
-    if (req.body.client_age) {
-      await pool.query('UPDATE client SET client_age = $1 WHERE client_id = $2', [req.body.client_age, id]);
-    }
-
-    if (req.body.client_profile_picture) {
-      await pool.query('UPDATE client SET client_profile_picture = $1 WHERE client_id = $2', [
-        req.body.client_profile_picture,
-        id,
-      ]);
-    }
-
     if (req.body.client_phone_number) {
       await pool.query('UPDATE client SET client_phone_number = $1 WHERE client_id = $2', [
         req.body.client_phone_number,
@@ -81,7 +65,7 @@ const updateClientInfo = async (req, res) => {
       ]);
     }
 
-    res.json('Client`s email was updated!');
+    res.json('Client`s info was updated!');
   } catch (err) {
     console.error(err.message);
   }
