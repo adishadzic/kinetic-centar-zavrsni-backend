@@ -27,7 +27,7 @@ CREATE TABLE service(
 );
 
 CREATE TABLE reservation(
-    reservation_id uuid DEFAULT uuid_generate_v4 () UNIQUE,
+    reservation_id SERIAL,
     reservation_date DATE NOT NULL,
     reservation_name VARCHAR(30),
     serviceID INT,
