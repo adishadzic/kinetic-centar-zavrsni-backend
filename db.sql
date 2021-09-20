@@ -29,6 +29,7 @@ CREATE TABLE service(
 CREATE TABLE reservation(
     reservation_id SERIAL,
     reservation_date DATE NOT NULL,
+    reservation_time TIME NOT NULL,
     reservation_name VARCHAR(30),
     serviceID INT,
     clientID INT,
