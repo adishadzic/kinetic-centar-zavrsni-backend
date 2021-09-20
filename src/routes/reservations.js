@@ -2,10 +2,10 @@ const pool = require('../config/databaseConfig');
 
 const addNewReservation = async (req, res) => {
   try {
-    const { reservation_date, reservation_time, reservation_name, serviceID, clientID } = req.body;
+    const { reservation_date, reservation_name, serviceID, clientID } = req.body;
     const newReservation = await pool.query(
-      'INSERT INTO reservation (reservation_date, reservation_time, reservation_name, serviceID, clientID) VALUES($1, $2, $3, $4, $5) RETURNING *',
-      [reservation_date, reservation_time, reservation_name, serviceID, clientID]
+      'INSERT INTO reservation (reservation_date, reservation_name, serviceID, clientID) VALUES($1, $2, $3, $4) RETURNING *',
+      [reservation_date, reservation_name, serviceID, clientID]
     );
 
     res.json(newReservation.rows[0]);
