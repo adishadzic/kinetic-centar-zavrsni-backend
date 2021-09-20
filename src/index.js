@@ -10,7 +10,7 @@ const reservations = require('./routes/reservations');
 
 const { corsConfig } = require('./config/corsConfig');
 
-const port = process.env.PORT;
+const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(morgan('combined'));
