@@ -1,51 +1,26 @@
 const pool = require('../config/databaseConfig');
+const { validateReservationRange } = require('../helper');
 
-function addZero(i) {
-  if (i < 10) {
-    i = '0' + i;
-  }
-  return i;
-}
+// function addZero(i) {
+//   if (i < 10) {
+//     i = '0' + i;
+//   }
+//   return i;
+// }
 
 const addNewReservation = async (req, res) => {
   try {
     let reservations_all = await pool.query('SELECT * FROM reservation');
     let reservations = reservations_all.rows;
 
-    reservations.forEach((reservation) => {
-      let startDate = new Date(reservation.reservation_start);
-      let date = addZero(startDate.getUTCDate());
-      let month = addZero(startDate.getUTCMonth() + 1);
-      let year = startDate.getUTCFullYear();
-      let newDate = year + '-' + month + '-' + date;
+    console.log(reservations);
 
-      let h = addZero(startDate.getHours());
-      let m = addZero(startDate.getMinutes());
-      let s = addZero(startDate.getSeconds());
-      let reservationStart = h + ':' + m + ':' + s;
-
-      let dateConcat = newDate + ' ' + reservationStart;
-      console.log(dateConcat);
-      console.log(reservation);
-
-      // if (reservation.reservation_start === dateConcat) {
-      //   throw new Error('Nope');
-      // }
-
-      // let exists = Object.values(reservation).includes(reservation.reservation_start);
-      // if (exists) {
-      //   throw new Error('cant add');
-      // }
-
-      let hasValue = Object.values(reservation).includes('2021-09-05 09:01:00');
-      console.log(hasValue);
-
-      // Object.keys(reservation).forEach(function (key) {
-      //   if (reservation[key] === dateConcat) {
-      //     throw new Error('Nope');
-      //   }
-      // });
-    });
+    const isValid = validateReservationRange(
+      reservations,
+      req.body.reservation_start,
+      req.body.reservation_end
+    );
+    if (!isValid) return res.status(400).json({ message: 'Invalid reservation range' });
 
     const newReservation = await pool.query(
       'INSERT INTO reservation (reservation_start, reservation_end, reservation_name, serviceID, clientID) VALUES($1, $2, $3, $4, $5) RETURNING *',
@@ -88,12 +63,28 @@ const getReservationById = async (req, res) => {
 const updateReservation = async (req, res) => {
   try {
     const { id } = req.params;
-    if (req.body.reservation_date) {
-      await pool.query('UPDATE reservation SET reservation_date = $1 WHERE reservation_id = $2', [
-        req.body.reservation_date,
-        id,
-      ]);
+
+    const isValid = validateReservationRange(
+      reservations,
+      req.body.reservation_start,
+      req.body.reservation_end,
+      id
+    );
+    if (!isValid) return res.status(400).json({ message: 'Invalid reservation range' });
+
+    if (req.body.reservation_start && req.body.reservation_end) {
+      await pool.query(
+        'UPDATE reservation SET reservation_start = $1,reservation_end = $2 WHERE reservation_id = $3',
+        [req.body.reservation_start, req.body.reservation_end, id]
+      );
     }
+
+    // if (req.body.reservation_date) {
+    //   await pool.query('UPDATE reservation SET reservation_date = $1 WHERE reservation_id = $2', [
+    //     req.body.reservation_date,
+    //     id,
+    //   ]);
+    // }
 
     if (req.body.reservation_name) {
       await pool.query('UPDATE reservation SET reservation_name = $1 WHERE reservation_id = $2', [

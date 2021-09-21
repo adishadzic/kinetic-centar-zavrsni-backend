@@ -1,8 +1,6 @@
 const pool = require('../config/databaseConfig');
 const { clienEmailValidation } = require('../utils/validation');
 
-pool.connect();
-
 const addNewClient = async (req, res) => {
   const { error } = clienEmailValidation(req.body);
   if (error) {
