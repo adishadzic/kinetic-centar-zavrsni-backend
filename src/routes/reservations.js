@@ -1,11 +1,61 @@
 const pool = require('../config/databaseConfig');
 
+function addZero(i) {
+  if (i < 10) {
+    i = '0' + i;
+  }
+  return i;
+}
+
 const addNewReservation = async (req, res) => {
   try {
-    const { reservation_date, reservation_name, serviceID, clientID } = req.body;
+    let reservations_all = await pool.query('SELECT * FROM reservation');
+    let reservations = reservations_all.rows;
+
+    reservations.forEach((reservation) => {
+      let startDate = new Date(reservation.reservation_start);
+      let date = addZero(startDate.getUTCDate());
+      let month = addZero(startDate.getUTCMonth() + 1);
+      let year = startDate.getUTCFullYear();
+      let newDate = year + '-' + month + '-' + date;
+
+      let h = addZero(startDate.getHours());
+      let m = addZero(startDate.getMinutes());
+      let s = addZero(startDate.getSeconds());
+      let reservationStart = h + ':' + m + ':' + s;
+
+      let dateConcat = newDate + ' ' + reservationStart;
+      console.log(dateConcat);
+      console.log(reservation);
+
+      // if (reservation.reservation_start === dateConcat) {
+      //   throw new Error('Nope');
+      // }
+
+      // let exists = Object.values(reservation).includes(reservation.reservation_start);
+      // if (exists) {
+      //   throw new Error('cant add');
+      // }
+
+      let hasValue = Object.values(reservation).includes('2021-09-05 09:01:00');
+      console.log(hasValue);
+
+      // Object.keys(reservation).forEach(function (key) {
+      //   if (reservation[key] === dateConcat) {
+      //     throw new Error('Nope');
+      //   }
+      // });
+    });
+
     const newReservation = await pool.query(
-      'INSERT INTO reservation (reservation_date, reservation_name, serviceID, clientID) VALUES($1, $2, $3, $4) RETURNING *',
-      [reservation_date, reservation_name, serviceID, clientID]
+      'INSERT INTO reservation (reservation_start, reservation_end, reservation_name, serviceID, clientID) VALUES($1, $2, $3, $4, $5) RETURNING *',
+      [
+        req.body.reservation_start,
+        req.body.reservation_end,
+        req.body.reservation_name,
+        req.body.serviceID,
+        req.body.clientID,
+      ]
     );
 
     res.json(newReservation.rows[0]);
