@@ -11,8 +11,8 @@ router.post('/register', validCreds, async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(admin_password, 10);
 
     const newAdmin = await pool.query(
-      'INSERT INTO admin (admin_first_name, admin_last_name, admin_email, admin_password, admin_profile_picture) VALUES($1, $2, $3, $4, $5) RETURNING *',
-      [admin_first_name, admin_last_name, admin_email, hashedPassword, admin_profile_picture]
+      'INSERT INTO admin (admin_first_name, admin_last_name, admin_email, admin_password) VALUES($1, $2, $3, $4, $5) RETURNING *',
+      [admin_first_name, admin_last_name, admin_email, hashedPassword]
     );
 
     const token = jwtSigner(newAdmin.rows[0].admin_id);
