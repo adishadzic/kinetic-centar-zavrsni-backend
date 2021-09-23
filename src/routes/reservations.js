@@ -15,12 +15,22 @@ const addNewReservation = async (req, res) => {
 
     console.log(reservations);
 
-    const isValid = validateReservationRange(reservations, req.body.startDate, req.body.endDate);
+    const isValid = validateReservationRange(
+      reservations,
+      req.body.reservation_start,
+      req.body.reservation_end
+    );
     if (!isValid) return res.status(400).json({ message: 'Invalid reservation range' });
 
     const newReservation = await pool.query(
-      'INSERT INTO reservation (startDate, endDate, title, serviceID, clientID) VALUES($1, $2, $3, $4, $5) RETURNING *',
-      [req.body.startDate, req.body.endDate, req.body.title, req.body.serviceID, req.body.clientID]
+      'INSERT INTO reservation (reservation_start, reservation_end, reservation_name, serviceID, clientID) VALUES($1, $2, $3, $4, $5) RETURNING *',
+      [
+        req.body.reservation_start,
+        req.body.reservation_end,
+        req.body.reservation_name,
+        req.body.serviceID,
+        req.body.clientID,
+      ]
     );
 
     res.json(newReservation.rows[0]);
@@ -54,19 +64,33 @@ const updateReservation = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const isValid = validateReservationRange(reservations, req.body.startDate, req.body.endDate, id);
+    const isValid = validateReservationRange(
+      reservations,
+      req.body.reservation_start,
+      req.body.reservation_end,
+      id
+    );
     if (!isValid) return res.status(400).json({ message: 'Invalid reservation range' });
 
-    if (req.body.startDate && req.body.endDate) {
-      await pool.query('UPDATE reservation SET startDate = $1,endDate = $2 WHERE reservation_id = $3', [
-        req.body.startDate,
-        req.body.endDate,
-        id,
-      ]);
+    if (req.body.reservation_start && req.body.reservation_end) {
+      await pool.query(
+        'UPDATE reservation SET reservation_start = $1,reservation_end = $2 WHERE reservation_id = $3',
+        [req.body.reservation_start, req.body.reservation_end, id]
+      );
     }
 
-    if (req.body.title) {
-      await pool.query('UPDATE reservation SET title = $1 WHERE reservation_id = $2', [req.body.title, id]);
+    // if (req.body.reservation_date) {
+    //   await pool.query('UPDATE reservation SET reservation_date = $1 WHERE reservation_id = $2', [
+    //     req.body.reservation_date,
+    //     id,
+    //   ]);
+    // }
+
+    if (req.body.reservation_name) {
+      await pool.query('UPDATE reservation SET reservation_name = $1 WHERE reservation_id = $2', [
+        req.body.reservation_name,
+        id,
+      ]);
     }
 
     res.json('Reservation was updated!');
