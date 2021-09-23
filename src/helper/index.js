@@ -2,7 +2,7 @@ const validateReservationRange = (reservations, newStartTime, newEndTime, reserv
   if (reservations && reservations.length == 0) return true;
   for (const reservation of reservations) {
     if (reservation.reservation_id == reservationId) continue;
-    if (!(newStartTime >= reservation.endDate || newEndTime <= reservation.startDate)) {
+    if (!(newStartTime >= reservation.enddate || newEndTime <= reservation.startdate)) {
       return false;
     }
   }
