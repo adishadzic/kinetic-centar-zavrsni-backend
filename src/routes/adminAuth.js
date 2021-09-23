@@ -5,6 +5,23 @@ const bcrypt = require('bcryptjs');
 const jwtSigner = require('../utils/jwt');
 const validCreds = require('../middleware/validCreds');
 
+router.post('/register', validCreds, async (req, res, next) => {
+  try {
+    const { admin_first_name, admin_last_name, admin_email, admin_password } = req.body;
+    const hashedPassword = await bcrypt.hash(admin_password, 10);
+
+    const newAdmin = await pool.query(
+      'INSERT INTO admin (admin_first_name, admin_last_name, admin_email, admin_password, admin_profile_picture) VALUES($1, $2, $3, $4, $5) RETURNING *',
+      [admin_first_name, admin_last_name, admin_email, hashedPassword, admin_profile_picture]
+    );
+
+    const token = jwtSigner(newAdmin.rows[0].admin_id);
+    res.json({ token });
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
 router.post('/login', validCreds, async (req, res, next) => {
   try {
     const { email, password } = req.body;
