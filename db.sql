@@ -30,7 +30,7 @@ CREATE TABLE reservation(
     reservation_id SERIAL,
     startDate VARCHAR(255) NOT NULL,
     endDate VARCHAR(255) NOT NULL,
-    title VARCHAR(30),
+    title VARCHAR(255),
     serviceID INT,
     clientID INT,
     PRIMARY KEY(reservation_id),
