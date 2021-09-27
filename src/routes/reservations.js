@@ -26,7 +26,7 @@ const addNewReservation = async (req, res) => {
     res.json(newReservation.rows[0]);
   } catch (err) {
     console.error(err.message);
-    res.json("Service or client doesn't exist");
+    res.json({ error: err.message });
   }
 };
 
