@@ -79,7 +79,6 @@ const removeClient = async (req, res) => {
     res.json('Client was removed from the database!');
   } catch (err) {
     console.error(err.message);
-    res.json('Error');
   }
 };
 
