@@ -1,13 +1,6 @@
 const pool = require('../config/databaseConfig');
 const { validateReservationRange } = require('../helper');
 
-// function addZero(i) {
-//   if (i < 10) {
-//     i = '0' + i;
-//   }
-//   return i;
-// }
-
 const addNewReservation = async (req, res) => {
   try {
     let reservations_all = await pool.query('SELECT * FROM reservation');
@@ -26,7 +19,6 @@ const addNewReservation = async (req, res) => {
     res.json(newReservation.rows[0]);
   } catch (err) {
     console.error(err.message);
-    res.json({ error: err.message });
   }
 };
 
