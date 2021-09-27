@@ -76,7 +76,7 @@ const removeService = async (req, res) => {
 
     res.json('Service was removed from the database!');
   } catch (err) {
-    console.error(err.message);
+    res.status(401).json({ error: err.message });
   }
 };
 
