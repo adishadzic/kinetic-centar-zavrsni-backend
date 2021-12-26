@@ -1,5 +1,5 @@
-const pool = require('../config/databaseConfig');
-const { clienEmailValidation } = require('../utils/validation');
+const pool = require("../config/databaseConfig");
+const { clienEmailValidation } = require("../utils/validation");
 
 const addNewClient = async (req, res) => {
   const { error } = clienEmailValidation(req.body);
@@ -17,20 +17,26 @@ const addNewClient = async (req, res) => {
       client_sex,
     } = req.body;
     const newClient = await pool.query(
-      'INSERT INTO client (client_first_name, client_last_name, client_email, client_phone_number, client_birth_date, client_sex) VALUES($1, $2, $3, $4, $5, $6) RETURNING *',
-      [client_first_name, client_last_name, client_email, client_phone_number, client_birth_date, client_sex]
+      "INSERT INTO client (client_first_name, client_last_name, client_email, client_phone_number, client_birth_date, client_sex) VALUES($1, $2, $3, $4, $5, $6) RETURNING *",
+      [
+        client_first_name,
+        client_last_name,
+        client_email,
+        client_phone_number,
+        client_birth_date,
+        client_sex,
+      ]
     );
 
     res.json({ Success: newClient.rows[0] });
   } catch (err) {
-    console.error(err.message);
-    res.json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 };
 
 const getAllClients = async (req, res) => {
   try {
-    const allClients = await pool.query('SELECT * FROM client');
+    const allClients = await pool.query("SELECT * FROM client");
     res.json(allClients.rows);
   } catch (err) {
     console.error(err.message);
@@ -40,7 +46,10 @@ const getAllClients = async (req, res) => {
 const getClientById = async (req, res) => {
   try {
     const { id } = req.params;
-    const client = await pool.query('SELECT * FROM client WHERE client_id = $1', [id]);
+    const client = await pool.query(
+      "SELECT * FROM client WHERE client_id = $1",
+      [id]
+    );
     res.json(client.rows[0]);
   } catch (err) {
     console.error(err.message);
@@ -52,20 +61,20 @@ const updateClientInfo = async (req, res) => {
     const { id } = req.params;
 
     if (req.body.client_email) {
-      await pool.query('UPDATE client SET client_email = $1 WHERE client_id = $2', [
-        req.body.client_email,
-        id,
-      ]);
+      await pool.query(
+        "UPDATE client SET client_email = $1 WHERE client_id = $2",
+        [req.body.client_email, id]
+      );
     }
 
     if (req.body.client_phone_number) {
-      await pool.query('UPDATE client SET client_phone_number = $1 WHERE client_id = $2', [
-        req.body.client_phone_number,
-        id,
-      ]);
+      await pool.query(
+        "UPDATE client SET client_phone_number = $1 WHERE client_id = $2",
+        [req.body.client_phone_number, id]
+      );
     }
 
-    res.json('Client`s info was updated!');
+    res.json("Client`s info was updated!");
   } catch (err) {
     console.error(err.message);
   }
@@ -74,9 +83,12 @@ const updateClientInfo = async (req, res) => {
 const removeClient = async (req, res) => {
   try {
     const { id } = req.params;
-    const deleteClient = await pool.query('DELETE FROM client WHERE client_id = $1', [id]);
+    const deleteClient = await pool.query(
+      "DELETE FROM client WHERE client_id = $1",
+      [id]
+    );
 
-    res.json('Client was removed from the database!');
+    res.json("Client was removed from the database!");
   } catch (err) {
     res.status(401).json({ error: err.message });
   }
@@ -97,4 +109,11 @@ const clientSearch = async (req, res) => {
   }
 };
 
-module.exports = { addNewClient, getAllClients, getClientById, updateClientInfo, removeClient, clientSearch };
+module.exports = {
+  addNewClient,
+  getAllClients,
+  getClientById,
+  updateClientInfo,
+  removeClient,
+  clientSearch,
+};
